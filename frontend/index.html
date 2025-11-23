@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Alerta Temprana </title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🎓</span>
+                    <div>
+                        <h1>Sistema de Alerta Temprana</h1>
+                        <p>Predicción de Deserción Estudiantil</p>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Modelo</span>
+                        <span class="stat-value">Naive Bayes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Recall</span>
+                        <span class="stat-value" id="model-recall">62.9%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Threshold</span>
+                        <span class="stat-value" id="model-threshold">0.35</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="container">
+            <div class="grid">
+                <!-- Formulario de Entrada -->
+                <div class="form-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>📋 Datos del Estudiante</h2>
+                            <p>Complete todos los campos para realizar la predicción</p>
+                        </div>
+
+                        <form id="prediction-form">
+                            <!-- Sección Demográfica -->
+                            <div class="form-section-title">
+                                <span class="section-icon">👤</span>
+                                <h3>Información Demográfica</h3>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edad_ingreso">
+                                    Edad de Ingreso
+                                    <button type="button" class="info-btn" data-info="edad">ℹ️</button>
+                                </label>
+                                <div class="tooltip" id="info-edad">
+                                    Edad del estudiante al momento de ingresar a la universidad. Rango típico: 16-35 años.
+                                </div>
+                                <input 
+                                    type="number" 
+                                    id="edad_ingreso" 
+                                    name="edad_ingreso" 
+                                    min="16" 
+                                    max="35" 
+                                    required
+                                    placeholder="Ej: 18"
+                                >
+                                <span class="input-hint">16-35 años</span>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="sexo">
+                                        Sexo
+                                        <button type="button" class="info-btn" data-info="sexo">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-sexo">
+                                        Género del estudiante registrado en el sistema institucional.
+                                    </div>
+                                    <select id="sexo" name="sexo" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="M">Masculino</option>
+                                        <option value="F">Femenino</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="estrato">
+                                        Estrato Socioeconómico
+                                        <button type="button" class="info-btn" data-info="estrato">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-estrato">
+                                        Nivel socioeconómico del estudiante (1-6). Indica capacidad económica familiar.
+                                    </div>
+                                    <select id="estrato" name="estrato" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="1">Estrato 1</option>
+                                        <option value="2">Estrato 2</option>
+                                        <option value="3">Estrato 3</option>
+                                        <option value="4">Estrato 4</option>
+                                        <option value="5">Estrato 5</option>
+                                        <option value="6">Estrato 6</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Sección Académica -->
+                            <div class="form-section-title">
+                                <span class="section-icon">📚</span>
+                                <h3>Información Académica</h3>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="programa">
+                                    Programa Académico
+                                    <button type="button" class="info-btn" data-info="programa">ℹ️</button>
+                                </label>
+                                <div class="tooltip" id="info-programa">
+                                    Programa académico en el que está matriculado el estudiante.
+                                </div>
+                                <select id="programa" name="programa" required>
+                                    <option value="">Cargando programas...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="promedio_historico">
+                                        Promedio Acumulado
+                                        <button type="button" class="info-btn" data-info="promedio">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-promedio">
+                                        Promedio académico histórico del estudiante. Escala: 0.0 - 5.0
+                                    </div>
+                                    <input 
+                                        type="number" 
+                                        id="promedio_historico" 
+                                        name="promedio_historico" 
+                                        min="0" 
+                                        max="5" 
+                                        step="0.1" 
+                                        required
+                                        placeholder="Ej: 3.5"
+                                    >
+                                    <span class="input-hint">0.0 - 5.0</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="creditos_maximos">
+                                        Créditos Máximos
+                                        <button type="button" class="info-btn" data-info="creditos">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-creditos">
+                                        Número máximo de créditos matriculados en un periodo. Típicamente: 12-24 créditos.
+                                    </div>
+                                    <input 
+                                        type="number" 
+                                        id="creditos_maximos" 
+                                        name="creditos_maximos" 
+                                        min="6" 
+                                        max="24" 
+                                        required
+                                        placeholder="Ej: 18"
+                                    >
+                                    <span class="input-hint">6-24 créditos</span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="total_periodos">
+                                        Total de Periodos
+                                        <button type="button" class="info-btn" data-info="periodos">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-periodos">
+                                        Número total de periodos académicos cursados. Incluye periodos activos e inactivos.
+                                    </div>
+                                    <input 
+                                        type="number" 
+                                        id="total_periodos" 
+                                        name="total_periodos" 
+                                        min="1" 
+                                        max="15" 
+                                        required
+                                        placeholder="Ej: 4"
+                                    >
+                                    <span class="input-hint">1-15 periodos</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tasa_aprobacion_media">
+                                        Tasa de Aprobación (%)
+                                        <button type="button" class="info-btn" data-info="tasa">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-tasa">
+                                        Porcentaje promedio de materias aprobadas. 0% = ninguna aprobada, 100% = todas aprobadas.
+                                    </div>
+                                    <input 
+                                        type="number" 
+                                        id="tasa_aprobacion_media" 
+                                        name="tasa_aprobacion_media" 
+                                        min="0" 
+                                        max="100" 
+                                        step="1" 
+                                        required
+                                        placeholder="Ej: 85"
+                                    >
+                                    <span class="input-hint">0-100%</span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="rezago_final">
+                                        Rezago Académico
+                                        <button type="button" class="info-btn" data-info="rezago">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-rezago">
+                                        Número de periodos de atraso respecto al plan de estudios. 0 = sin rezago.
+                                    </div>
+                                    <input 
+                                        type="number" 
+                                        id="rezago_final" 
+                                        name="rezago_final" 
+                                        min="0" 
+                                        max="3" 
+                                        step="0.1" 
+                                        required
+                                        placeholder="Ej: 0.5"
+                                    >
+                                    <span class="input-hint">0.0 - 3.0 periodos</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="ha_estado_fuera">
+                                        Ha Estado Fuera
+                                        <button type="button" class="info-btn" data-info="fuera">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-fuera">
+                                        Indica si el estudiante ha tenido periodos de inactividad académica.
+                                    </div>
+                                    <select id="ha_estado_fuera" name="ha_estado_fuera" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="0">No</option>
+                                        <option value="1">Sí</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Sección Socioeconómica -->
+                            <div class="form-section-title">
+                                <span class="section-icon">💰</span>
+                                <h3>Información Socioeconómica</h3>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="tiene_beca">
+                                        Tiene Beca
+                                        <button type="button" class="info-btn" data-info="beca">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-beca">
+                                        Indica si el estudiante cuenta con algún tipo de apoyo financiero o beca.
+                                    </div>
+                                    <select id="tiene_beca" name="tiene_beca" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="0">No</option>
+                                        <option value="1">Sí</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="naturaleza_colegio">
+                                        Tipo de Colegio
+                                        <button type="button" class="info-btn" data-info="colegio">ℹ️</button>
+                                    </label>
+                                    <div class="tooltip" id="info-colegio">
+                                        Naturaleza del colegio de procedencia del estudiante.
+                                    </div>
+                                    <select id="naturaleza_colegio" name="naturaleza_colegio" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="PRIVADO">Privado</option>
+                                        <option value="PUBLICO">Público</option>
+                                        <option value="OTRO">Otro</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="calendario">
+                                    Calendario
+                                    <button type="button" class="info-btn" data-info="calendario">ℹ️</button>
+                                </label>
+                                <div class="tooltip" id="info-calendario">
+                                    Calendario académico del colegio de procedencia (A = Enero-Noviembre, B = Agosto-Junio).
+                                </div>
+                                <select id="calendario" name="calendario" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="A">Calendario A</option>
+                                    <option value="B">Calendario B</option>
+                                    <option value="OTRO">Otro</option>
+                                </select>
+                            </div>
+
+                            <!-- Botón de Submit -->
+                            <button type="submit" class="btn-primary" id="predict-btn">
+                                <span class="btn-icon">🎯</span>
+                                Realizar Predicción
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Resultados -->
+                <div class="results-section">
+                    <!-- Estado inicial -->
+                    <div class="card" id="initial-state">
+                        <div class="empty-state">
+                            <div class="empty-icon">📊</div>
+                            <h3>Esperando Datos</h3>
+                            <p>Complete el formulario para ver la predicción de riesgo de deserción</p>
+                        </div>
+                    </div>
+
+                    <!-- Resultados de la predicción -->
+                    <div class="card hidden" id="results-card">
+                        <div class="card-header">
+                            <h2>📈 Resultado de la Predicción</h2>
+                        </div>
+
+                        <!-- Medidor de Riesgo -->
+                        <div class="gauge-container">
+                            <h3>Nivel de Riesgo</h3>
+                            <div class="gauge" id="risk-gauge">
+                                <svg viewBox="0 0 200 120">
+                                    <!-- Arco de fondo -->
+                                    <path d="M 20 100 A 80 80 0 0 1 180 100" 
+                                          fill="none" 
+                                          stroke="#e5e7eb" 
+                                          stroke-width="20" 
+                                          stroke-linecap="round"/>
+                                    
+                                    <!-- Segmento BAJO (verde) -->
+                                    <path d="M 20 100 A 80 80 0 0 1 68 37" 
+                                          fill="none" 
+                                          stroke="#10b981" 
+                                          stroke-width="20" 
+                                          stroke-linecap="round"/>
+                                    
+                                    <!-- Segmento MEDIO (amarillo) -->
+                                    <path d="M 68 37 A 80 80 0 0 1 132 37" 
+                                          fill="none" 
+                                          stroke="#f59e0b" 
+                                          stroke-width="20" 
+                                          stroke-linecap="round"/>
+                                    
+                                    <!-- Segmento ALTO (rojo) -->
+                                    <path d="M 132 37 A 80 80 0 0 1 180 100" 
+                                          fill="none" 
+                                          stroke="#ef4444" 
+                                          stroke-width="20" 
+                                          stroke-linecap="round"/>
+                                    
+                                    <!-- Aguja -->
+                                    <line id="gauge-needle" 
+                                          x1="100" 
+                                          y1="100" 
+                                          x2="100" 
+                                          y2="30" 
+                                          stroke="#1f2937" 
+                                          stroke-width="3" 
+                                          stroke-linecap="round"
+                                          transform="rotate(-90 100 100)"/>
+                                    
+                                    <!-- Centro de la aguja -->
+                                    <circle cx="100" cy="100" r="8" fill="#1f2937"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="gauge-labels">
+                                <span class="gauge-label">0%</span>
+                                <span class="gauge-label">50%</span>
+                                <span class="gauge-label">100%</span>
+                            </div>
+                            
+                            <div class="probability-display">
+                                <div class="probability-value" id="probability-value">0%</div>
+                                <div class="probability-label">Probabilidad de Deserción</div>
+                            </div>
+                        </div>
+
+                        <!-- Estado de Riesgo -->
+                        <div class="risk-status" id="risk-status">
+                            <div class="risk-badge">
+                                <span class="risk-icon">🟢</span>
+                                <span class="risk-text">RIESGO BAJO</span>
+                            </div>
+                            <p class="risk-recommendation" id="risk-recommendation">
+                                Seguimiento estándar. El estudiante muestra señales positivas.
+                            </p>
+                        </div>
+
+                        <!-- Factores de Riesgo -->
+                        <div class="risk-factors">
+                            <h4>⚠️ Factores de Riesgo Detectados</h4>
+                            <div id="risk-factors-list" class="factors-list">
+                                <p class="no-factors">✓ No se detectaron factores de riesgo críticos</p>
+                            </div>
+                        </div>
+
+                        <!-- Perfil del Estudiante -->
+                        <div class="student-profile">
+                            <h4>👤 Perfil del Estudiante</h4>
+                            <div class="profile-grid" id="student-profile">
+                                <!-- Se llenará dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado de carga -->
+                    <div class="card hidden" id="loading-state">
+                        <div class="loading-content">
+                            <div class="spinner"></div>
+                            <h3>Procesando Predicción...</h3>
+                            <p>Analizando datos del estudiante</p>
+                        </div>
+                    </div>
+
+                    <!-- Estado de error -->
+                    <div class="card hidden" id="error-state">
+                        <div class="error-content">
+                            <div class="error-icon">⚠️</div>
+                            <h3>Error en la Predicción</h3>
+                            <p id="error-message">Ocurrió un error al procesar la solicitud</p>
+                            <button class="btn-secondary" onclick="resetForm()">Intentar Nuevamente</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Sistema de Alerta Temprana - Predicción de Deserción Estudiantil</p>
+            <p>Modelo: Naive Bayes + SMOTE | Desarrollado para Tesis de Grado</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

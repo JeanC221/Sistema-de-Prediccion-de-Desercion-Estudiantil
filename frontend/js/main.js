@@ -1,7 +1,5 @@
 
-const API_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:5000' 
-    : 'https://desercion-uninorte.onrender.com';
+const API_URL = 'https://sade-ay36.onrender.com';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Sistema inicializado');

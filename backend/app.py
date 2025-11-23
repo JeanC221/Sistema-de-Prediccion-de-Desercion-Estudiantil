@@ -1,8 +1,3 @@
-"""
-Sistema de Predicción de Deserción Estudiantil
-Backend API con Flask
-"""
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pickle
@@ -10,17 +5,13 @@ import pandas as pd
 import numpy as np
 import logging
 
-# Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# ============================================================================
-# DEFINICIÓN DE CLASE DEL MODELO (necesaria para deserializar)
-# ============================================================================
+# MODELO 
 
 class ModeloPredictorDesercion:
-    """Pipeline completa con threshold integrado"""
 
     def __init__(self, model, threshold, discretizer, imputer_num,
                  imputer_cat, label_encoders, num_cols, cat_cols, feature_names):
@@ -35,40 +26,33 @@ class ModeloPredictorDesercion:
         self.feature_names = feature_names
 
     def predict_proba(self, X):
-        """Retorna probabilidades [P(no desertor), P(desertor)]"""
+        #[P(no desertor), P(desertor)]
         X_proc = self._preprocess(X)
         return self.model.predict_proba(X_proc)
 
     def predict(self, X):
-        """Retorna predicción con threshold integrado"""
         proba = self.predict_proba(X)[:, 1]
         return (proba >= self.threshold).astype(int)
 
     def _preprocess(self, X):
-        """Aplica todo el preprocesamiento"""
         X_proc = X.copy()
 
-        # Imputar
         X_proc[self.num_cols] = self.imputer_num.transform(X_proc[self.num_cols])
         X_proc[self.cat_cols] = self.imputer_cat.transform(X_proc[self.cat_cols])
 
-        # Codificar categóricas
         for col in self.cat_cols:
             if col in self.label_encoders:
                 X_proc[col] = self.label_encoders[col].transform(X_proc[col].astype(str))
             else:
                 X_proc[col] = X_proc[col].astype(int)
 
-        # Discretizar
         X_proc[self.num_cols] = self.discretizer.transform(X_proc[self.num_cols]).astype(int)
 
         return X_proc
 app = Flask(__name__)
-CORS(app)  # Permitir requests desde el frontend
+CORS(app)  
         
-# ============================================================================
 # CARGAR MODELO Y MAPEOS
-# ============================================================================
 
 try:
     with open('model_results.pkl', 'rb') as f:
@@ -101,13 +85,10 @@ except Exception as e:
     logger.warning(f"Error cargando mapeos: {e}")
     mapeo_programas = {}
 
-# ============================================================================
-# RUTAS DE LA API
-# ============================================================================
+# RUTA API
 
 @app.route('/')
 def home():
-    """Página de inicio - información de la API"""
     return jsonify({
         'nombre': 'API de Predicción de Deserción Estudiantil',
         'version': '1.0',
@@ -124,7 +105,6 @@ def home():
 
 @app.route('/health')
 def health():
-    """Verificar estado del servidor"""
     return jsonify({
         'status': 'healthy',
         'modelo_cargado': pipeline is not None,
@@ -133,7 +113,6 @@ def health():
 
 @app.route('/programas')
 def get_programas():
-    """Obtener lista de programas con sus nombres"""
     programas_list = [
         {'codigo': codigo, 'nombre': nombre}
         for codigo, nombre in sorted(mapeo_programas.items(), key=lambda x: x[1])
@@ -142,7 +121,6 @@ def get_programas():
 
 @app.route('/info')
 def get_info():
-    """Información detallada del modelo"""
     if not pipeline:
         return jsonify({'error': 'Modelo no cargado'}), 500
     
@@ -166,41 +144,18 @@ def get_info():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """
-    Realizar predicción de deserción
-    
-    Body (JSON):
-    {
-        "edad_ingreso": 20,
-        "sexo": "M",
-        "estrato": 3,
-        "programa": "PINGSISTEMAS",
-        "promedio_historico": 3.5,
-        "creditos_maximos": 18,
-        "total_periodos": 4,
-        "tasa_aprobacion_media": 0.85,
-        "rezago_final": 0.5,
-        "ha_estado_fuera": 0,
-        "tiene_beca": 1,
-        "naturaleza_colegio": "PRIVADO",
-        "calendario": "A"
-    }
-    """
     
     if not pipeline:
         return jsonify({'error': 'Modelo no disponible'}), 500
     
     try:
-        # Obtener datos del request
         data = request.get_json()
 
-        # NORMALIZAR NATURALEZA_COLEGIO
         if data['naturaleza_colegio'].upper() in ['PUBLICO', 'PÚBLICO']:
             data['naturaleza_colegio'] = 'PÚBLICO'
         elif data['naturaleza_colegio'].upper() == 'PRIVADO':
             data['naturaleza_colegio'] = 'PRIVADO'
         
-        # Validar campos requeridos
         required_fields = [
             'edad_ingreso', 'sexo', 'estrato', 'programa',
             'promedio_historico', 'creditos_maximos', 'total_periodos',
@@ -215,7 +170,6 @@ def predict():
                 'campos': missing_fields
             }), 400
         
-        # Obtener ESCUELA desde PROGRAMA
         programa = data['programa']
         escuela_map = {
             'PRMEDICINA12': 'CS', 'PROFEDERECHO': 'JU', 'PINGSISTEMAS': 'IN',
@@ -232,10 +186,9 @@ def predict():
         }
         escuela = escuela_map.get(programa, 'IN')
         
-        # Crear DataFrame con datos RAW (antes de codificar)
         input_data = pd.DataFrame({
             'EDAD_INGRESO': [data['edad_ingreso']],
-            'SEXO': [data['sexo']],  # Mantener como texto
+            'SEXO': [data['sexo']],  
             'ESTRATO': [data['estrato']],
             'PROGRAMA': [programa],
             'ESCUELA': [escuela],
@@ -254,21 +207,20 @@ def predict():
         probabilidad = pipeline.predict_proba(input_data)[0][1]
         prediccion = pipeline.predict(input_data)[0]
         
-        # Determinar nivel de riesgo
         if probabilidad < 0.30:
             nivel_riesgo = 'BAJO'
-            color = '#10b981'  # Verde
+            color = '#10b981'  
             recomendacion = 'Seguimiento estándar. El estudiante muestra señales positivas.'
         elif probabilidad < 0.60:
             nivel_riesgo = 'MEDIO'
-            color = '#f59e0b'  # Amarillo
+            color = '#f59e0b'  
             recomendacion = 'Monitoreo preventivo recomendado. Ofrecer apoyo académico.'
         else:
             nivel_riesgo = 'ALTO'
-            color = '#ef4444'  # Rojo
+            color = '#ef4444'  
             recomendacion = 'Intervención urgente necesaria. Contactar al estudiante de inmediato.'
         
-        # Identificar factores de riesgo
+        # Factores de riesgo
         factores_riesgo = []
         if data['promedio_historico'] < 3.0:
             factores_riesgo.append({
@@ -342,25 +294,20 @@ def predict():
             'detalle': str(e)
         }), 500
 
-# ============================================================================
-# EJECUTAR SERVIDOR
-# ============================================================================
+# SERVIDOR
 
 if __name__ == '__main__':
-    print("="*70)
-    print("🎓 SERVIDOR DE PREDICCIÓN DE DESERCIÓN ESTUDIANTIL")
-    print("="*70)
-    print(f"Estado del modelo: {'✓ Cargado' if pipeline else '✗ Error'}")
+    print(f"Estado del modelo: {' Cargado' if pipeline else '✗ Error'}")
     print(f"Threshold: {threshold:.2f}" if pipeline else "N/A")
     print(f"Recall: {metrics.get('recall', 0)*100:.1f}%" if metrics else "N/A")
-    print("="*70)
-    print("\n🚀 Servidor iniciado en http://localhost:5000")
-    print("📝 Endpoints disponibles:")
+    print("\nServidor iniciado en http://localhost:5000")
+    print("Endpoints:")
     print("  GET  / - Información general")
     print("  GET  /health - Estado del servidor")
     print("  GET  /programas - Lista de programas")
     print("  GET  /info - Información del modelo")
     print("  POST /predict - Realizar predicción")
-    print("\n⏸️  Presiona Ctrl+C para detener\n")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)

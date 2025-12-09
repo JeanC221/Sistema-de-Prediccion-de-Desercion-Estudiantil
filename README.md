@@ -1,36 +1,18 @@
-# 🎓 Sistema de Predicción de Deserción Estudiantil
+#  Sistema de Predicción de Deserción Estudiantil
 
 Aplicación web completa para predicción temprana de deserción estudiantil usando Naive Bayes + SMOTE.
 
-## 📋 Características
+##  Características
 
-- ✨ **Interfaz moderna y profesional** con diseño responsive
-- 🎯 **Medidor visual de riesgo** estilo velocímetro con aguja animada
-- 📊 **Dashboard interactivo** con análisis detallado
-- ✅ **Validación completa** de todos los campos del formulario
-- ℹ️ **Tooltips informativos** para cada variable
-- 🔄 **API REST** con Flask para comunicación frontend-backend
-- 📱 **Responsive design** compatible con móviles y tablets
+-  **Interfaz moderna y profesional** con diseño responsive
+-  **Medidor visual de riesgo** estilo velocímetro con aguja animada
+-  **Dashboard interactivo** con análisis detallado
+-  **Validación completa** de todos los campos del formulario
+-  **Tooltips informativos** para cada variable
+-  **API REST** con Flask para comunicación frontend-backend
+-  **Responsive design** compatible con móviles y tablets
 
-## 🏗️ Estructura del Proyecto
-
-```
-desercion-detector/
-├── backend/
-│   ├── app.py                 # API Flask
-│   ├── model_results.pkl      # Modelo entrenado
-│   ├── mapeos_nombres.pkl     # Mapeos de programas/escuelas
-│   └── requirements.txt       # Dependencias Python
-├── frontend/
-│   ├── index.html            # Página principal
-│   ├── css/
-│   │   └── styles.css        # Estilos CSS
-│   └── js/
-│       └── main.js           # Lógica JavaScript
-└── README.md
-```
-
-## 🚀 Instalación
+##  Instalación
 
 ### Requisitos Previos
 
@@ -81,7 +63,7 @@ pip install --break-system-packages -r requirements.txt
 - imbalanced-learn 0.11.0
 - gunicorn 21.2.0
 
-## ▶️ Ejecución
+##  Ejecución
 
 ### Paso 1: Iniciar el Backend
 
@@ -90,30 +72,6 @@ En la carpeta `backend/`, ejecuta:
 ```bash
 python app.py
 ```
-
-Deberías ver algo como:
-
-```
-======================================================================
-🎓 SERVIDOR DE PREDICCIÓN DE DESERCIÓN ESTUDIANTIL
-======================================================================
-Estado del modelo: ✓ Cargado
-Threshold: 0.35
-Recall: 62.9%
-======================================================================
-
-🚀 Servidor iniciado en http://localhost:5000
-📝 Endpoints disponibles:
-  GET  / - Información general
-  GET  /health - Estado del servidor
-  GET  /programas - Lista de programas
-  GET  /info - Información del modelo
-  POST /predict - Realizar predicción
-
-⏸️  Presiona Ctrl+C para detener
-```
-
-**⚠️ NO CIERRES ESTA TERMINAL** - El servidor debe estar corriendo.
 
 ### Paso 2: Abrir el Frontend
 
@@ -125,7 +83,7 @@ Abre el archivo `frontend/index.html` en tu navegador web:
 
 La aplicación debería abrirse en tu navegador.
 
-## 📖 Uso de la Aplicación
+##  Uso de la Aplicación
 
 ### 1. Completar el Formulario
 
@@ -152,11 +110,11 @@ Llena todos los campos del formulario con los datos del estudiante:
 
 ### 2. Tooltips Informativos
 
-Haz clic en el ícono ℹ️ junto a cada campo para ver información detallada sobre qué significa esa variable.
+Haz clic en el ícono  junto a cada campo para ver información detallada sobre qué significa esa variable.
 
 ### 3. Realizar Predicción
 
-Haz clic en el botón **"🎯 Realizar Predicción"**.
+Haz clic en el botón **" Realizar Predicción"**.
 
 ### 4. Interpretar Resultados
 
@@ -167,9 +125,9 @@ La aplicación mostrará:
 - Zonas coloreadas: Verde (bajo), Amarillo (medio), Rojo (alto)
 
 **Nivel de Riesgo:**
-- 🟢 RIESGO BAJO (< 30%)
-- 🟡 RIESGO MEDIO (30-60%)
-- 🔴 RIESGO ALTO (> 60%)
+-  RIESGO BAJO (< 30%)
+-  RIESGO MEDIO (30-60%)
+-  RIESGO ALTO (> 60%)
 
 **Factores de Riesgo:**
 - Lista de factores detectados que aumentan el riesgo
@@ -177,7 +135,7 @@ La aplicación mostrará:
 **Perfil del Estudiante:**
 - Resumen de las características ingresadas
 
-## 🧪 Ejemplos de Prueba
+##  Ejemplos de Prueba
 
 ### Estudiante de Bajo Riesgo 🟢
 
@@ -239,151 +197,8 @@ Calendario: B
 Resultado esperado: 60-75% probabilidad, RIESGO ALTO
 ```
 
-## 🐛 Solución de Problemas
 
-### Error: "Cannot connect to backend"
-
-**Problema:** El frontend no puede conectarse al servidor Flask.
-
-**Solución:**
-1. Verifica que el servidor esté corriendo (debes ver el mensaje de inicio)
-2. Asegúrate de que esté en `http://localhost:5000`
-3. Revisa la consola del navegador (F12) para ver errores
-
-### Error: "Modelo no cargado"
-
-**Problema:** Los archivos `.pkl` no están en la carpeta correcta.
-
-**Solución:**
-1. Verifica que `model_results.pkl` y `mapeos_nombres.pkl` estén en `backend/`
-2. Reinicia el servidor Flask
-3. Revisa el output del servidor para ver si hay errores al cargar
-
-### Error: "ModuleNotFoundError"
-
-**Problema:** Faltan dependencias de Python.
-
-**Solución:**
-```bash
-cd backend
-pip install -r requirements.txt
-```
-
-### La página se ve rota (sin estilos)
-
-**Problema:** Los archivos CSS/JS no se cargan correctamente.
-
-**Solución:**
-1. Verifica que la estructura de carpetas sea correcta
-2. Asegúrate de que `css/styles.css` y `js/main.js` existan
-3. Abre la consola del navegador (F12) y revisa errores
-
-### El select de programas está vacío
-
-**Problema:** La API no está devolviendo los programas.
-
-**Solución:**
-1. Verifica que `mapeos_nombres.pkl` esté cargado
-2. Prueba acceder a `http://localhost:5000/programas` en el navegador
-3. Revisa los logs del servidor Flask
-
-## 📊 API Endpoints
-
-### GET /
-
-Información general de la API
-
-```json
-{
-  "nombre": "API de Predicción de Deserción Estudiantil",
-  "version": "1.0",
-  "estado": "activo"
-}
-```
-
-### GET /health
-
-Estado del servidor
-
-```json
-{
-  "status": "healthy",
-  "modelo_cargado": true,
-  "mapeos_cargados": true
-}
-```
-
-### GET /programas
-
-Lista de programas disponibles
-
-```json
-{
-  "programas": [
-    {
-      "codigo": "PINGSISTEMAS",
-      "nombre": "Ingeniería Sistemas Y Computac"
-    },
-    ...
-  ]
-}
-```
-
-### GET /info
-
-Información del modelo
-
-```json
-{
-  "modelo": "Naive Bayes Categórico",
-  "threshold": 0.35,
-  "metricas": {
-    "recall": "62.85%",
-    "precision": "21.00%",
-    ...
-  }
-}
-```
-
-### POST /predict
-
-Realizar predicción
-
-**Request Body:**
-```json
-{
-  "edad_ingreso": 20,
-  "sexo": "M",
-  "estrato": 3,
-  "programa": "PINGSISTEMAS",
-  "promedio_historico": 3.5,
-  "creditos_maximos": 18,
-  "total_periodos": 4,
-  "tasa_aprobacion_media": 0.85,
-  "rezago_final": 0.5,
-  "ha_estado_fuera": 0,
-  "tiene_beca": 1,
-  "naturaleza_colegio": "PRIVADO",
-  "calendario": "A"
-}
-```
-
-**Response:**
-```json
-{
-  "prediccion": {
-    "desertor": false,
-    "probabilidad": 25.3,
-    "nivel_riesgo": "BAJO",
-    "color": "#10b981"
-  },
-  "recomendacion": "Seguimiento estándar...",
-  "factores_riesgo": [...],
-  "perfil": {...}
-}
-```
-
-## 🎯 Métricas del Modelo
+##  Métricas del Modelo
 
 - **Modelo:** Naive Bayes Categórico
 - **Técnica de Balanceo:** SMOTE (sampling_strategy=0.43)
@@ -392,29 +207,6 @@ Realizar predicción
 - **Precision:** 21.00% (1 de cada 5 alertas es correcta)
 - **F1-Score:** 31.49%
 - **ROC-AUC:** 73.60%
-
-## 🚢 Deployment (Opcional)
-
-### Opción 1: Heroku
-
-```bash
-# En la carpeta backend/
-echo "web: gunicorn app:app" > Procfile
-git init
-git add .
-git commit -m "Initial commit"
-heroku create nombre-app
-git push heroku master
-```
-
-### Opción 2: Render
-
-1. Sube el código a GitHub
-2. Conecta con Render
-3. Configura como "Web Service"
-4. Comando de inicio: `gunicorn app:app`
-
-### Opción 3: Local Network
 
 Para acceder desde otros dispositivos en tu red local:
 
@@ -425,18 +217,3 @@ app.run(debug=False, host='0.0.0.0', port=5000)
 
 Luego accede desde `http://TU_IP:5000`
 
-## 📝 Notas para la Defensa
-
-1. **Demostrar con casos reales:** Usa los ejemplos de prueba
-2. **Explicar el medidor:** Muestra cómo la aguja se mueve según riesgo
-3. **Mostrar factores:** Destaca que el sistema identifica causas específicas
-4. **Enfatizar usabilidad:** Tooltips, validaciones, diseño intuitivo
-5. **Mencionar escalabilidad:** API REST lista para integración
-
-## 🤝 Créditos
-
-Desarrollado para Tesis de Grado - Sistema de Alerta Temprana
-
----
-
-**¿Problemas? Revisa la sección de Solución de Problemas o contacta al desarrollador.**

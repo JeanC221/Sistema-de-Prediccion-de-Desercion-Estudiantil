@@ -35,8 +35,8 @@ Descarga la carpeta `desercion-detector` completa en tu máquina.
 # En la carpeta backend/ deben estar estos archivos:
 backend/
 ├── app.py
-├── model_results.pkl          ← COPIAR DESDE COLAB
-├── mapeos_nombres.pkl         ← COPIAR DESDE COLAB
+├── model_results.pkl          
+├── mapeos_nombres.pkl         
 └── requirements.txt
 ```
 
@@ -49,7 +49,7 @@ cd backend
 pip install -r requirements.txt
 ```
 
-**Nota para Windows:** Si tienes problemas, prueba con:
+**Para Windows:** 
 ```bash
 pip install --break-system-packages -r requirements.txt
 ```

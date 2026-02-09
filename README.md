@@ -1,4 +1,4 @@
-# Student Dropout Prediction System 🎓📊
+# Student Dropout Prediction System 
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-orange.svg)](https://scikit-learn.org/)
